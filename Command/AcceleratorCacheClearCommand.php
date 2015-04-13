@@ -81,12 +81,22 @@ class AcceleratorCacheClearCommand extends ContainerAwareCommand
 
         $url = $host.'/'.$filename;
         $auth = $input->getOption('auth');
+        $forced_hostname = $container->getParameter('accelerator_cache.hostname');
 
         if ($container->getParameter('accelerator_cache.mode') == 'fopen') {
-            $context = null;
+            $http_headers = [];
             if (false === is_null($auth)) {
+                $http_headers[] = 'Authorization: Basic ' . base64_encode($auth);
+            }
+
+            if (false !== $forced_hostname) {
+                $http_headers[] = 'Host: ' . $forced_hostname;
+            }
+
+            $context = null;
+            if ($http_headers) {
                 $context = stream_context_create(['http' => [
-                    'header' => 'Authorization: Basic ' . base64_encode($auth),
+                    'header' => $http_headers,
                 ]]);
             }
 
@@ -105,11 +115,17 @@ class AcceleratorCacheClearCommand extends ContainerAwareCommand
             }
         }
         else {
+            $http_headers = [];
+
+            if (false !== $forced_hostname) {
+                $http_headers[] = 'Host: ' . $forced_hostname;
+            }
+
             $ch = curl_init($url);
 
             $curlOpts = $container->getParameter('accelerator_cache.curl_opts');
             curl_setopt_array($ch, array_replace($curlOpts, [
-                CURLOPT_HEADER => false,
+                CURLOPT_HEADER => $http_headers ?: false,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FAILONERROR => true
             ]));

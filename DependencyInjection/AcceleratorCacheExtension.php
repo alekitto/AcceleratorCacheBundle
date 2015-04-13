@@ -17,6 +17,7 @@ class AcceleratorCacheExtension extends Extension
             $config['host'] = 'http://'.$config['host'];
         }
         $container->setParameter('accelerator_cache.host', $config['host'] ? trim($config['host'], '/') : false);
+        $container->setParameter('accelerator_cache.hostname', $config['hostname']);
         $container->setParameter('accelerator_cache.web_dir', $config['web_dir']);
         $container->setParameter('accelerator_cache.mode', $config['mode']);
 

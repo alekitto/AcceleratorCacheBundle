@@ -24,6 +24,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('host')->defaultFalse()->end()
+                ->scalarNode('hostname')->defaultFalse()->end()
                 ->scalarNode('web_dir')->isRequired()->end()
                 ->scalarNode('mode')->defaultValue('fopen')->end()
                 ->arrayNode('curl_opts')
